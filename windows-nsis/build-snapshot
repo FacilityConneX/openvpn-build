@@ -12,9 +12,9 @@ get_full_path() {
 }
 
 GIT="${GIT:-git}"
-OPENVPN_VERSION="${OPENVPN_VERSION:-2.5_git}"; export OPENVPN_VERSION
-OPENVPN_BRANCH="${OPENVPN_BRANCH:-master}"
-OPENVPN_URL="${OPENVPN_URL:-http://github.com/OpenVPN/openvpn.git}"
+OPENVPN_VERSION="${OPENVPN_VERSION:-2.4.6}"; export OPENVPN_VERSION
+OPENVPN_BRANCH="${OPENVPN_BRANCH:-release/2.4}"
+OPENVPN_URL="${OPENVPN_URL:-https://github.com/FacilityConneX/openvpn.git}"
 
 SCRIPTROOT="$(get_full_path "$(dirname "$0")")"
 TMPDIR="${SCRIPTROOT}/tmp-$$"

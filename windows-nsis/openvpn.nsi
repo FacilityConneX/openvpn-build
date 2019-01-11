@@ -10,7 +10,7 @@
 
 SetCompressor /SOLID lzma
 
-!define PRODUCT_PUBLISHER "OpenVPN Technologies, Inc."
+!define PRODUCT_PUBLISHER "FacilityConnex LLC"
 
 ; !addplugindir ensures that nsProcess.nsh and DotNetChecker.nsh can be included
 !addplugindir .
@@ -69,7 +69,7 @@ InstallDirRegKey HKLM "SOFTWARE\${PACKAGE_NAME}" ""
 ;Modern UI Configuration
 
 ; Compile-time constants which we'll need during install
-!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of ${PACKAGE_NAME} ${SPECIAL_BUILD}, an Open Source VPN package by James Yonan.$\r$\n$\r$\nNote that the Windows version of ${PACKAGE_NAME} will only run on Windows Vista, or higher.$\r$\n$\r$\n$\r$\n"
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the installation of ${PACKAGE_NAME} ${SPECIAL_BUILD}, an SSL/TLS Encrypted Tunnel VPN package by FacilityConneX LLC.$\r$\n$\r$\nNote that the Windows version of ${PACKAGE_NAME} will only run on Windows Vista, or higher.$\r$\n$\r$\n$\r$\n"
 
 !define MUI_COMPONENTSPAGE_TEXT_TOP "Select the components to install/upgrade.  Stop any ${PACKAGE_NAME} processes or the ${PACKAGE_NAME} service if it is running.  All DLLs are installed locally."
 
@@ -103,9 +103,9 @@ InstallDirRegKey HKLM "SOFTWARE\${PACKAGE_NAME}" ""
 ;--------------------------------
 ;Language Strings
 
-LangString DESC_SecOpenVPNUserSpace ${LANG_ENGLISH} "Install ${PACKAGE_NAME} user-space components, including openvpn.exe."
+LangString DESC_SecOpenVPNUserSpace ${LANG_ENGLISH} "Install ${PACKAGE_NAME} user-space components."
 
-LangString DESC_SecOpenVPNGUI ${LANG_ENGLISH} "Install ${PACKAGE_NAME} GUI by Mathias Sundman"
+LangString DESC_SecOpenVPNGUI ${LANG_ENGLISH} "Install ${PACKAGE_NAME} GUI"
 
 LangString DESC_SecTAP ${LANG_ENGLISH} "Install/upgrade the TAP virtual device driver."
 
@@ -119,7 +119,7 @@ LangString DESC_SecPKCS11DLLs ${LANG_ENGLISH} "Install PKCS#11 helper DLLs local
 
 LangString DESC_SecService ${LANG_ENGLISH} "Install the ${PACKAGE_NAME} service wrappers"
 
-LangString DESC_SecInteractiveService ${LANG_ENGLISH} "Install the ${PACKAGE_NAME} Interactive Service (allows running OpenVPN-GUI without admin privileges)"
+LangString DESC_SecInteractiveService ${LANG_ENGLISH} "Install the ${PACKAGE_NAME} Interactive Service"
 
 LangString DESC_SecOpenSSLUtilities ${LANG_ENGLISH} "Install the OpenSSL Utilities (used for generating public/private key pairs)."
 
@@ -258,11 +258,11 @@ Section -pre
 	FindWindow $0 "OpenVPN-GUI"
 	StrCmp $0 0 guiNotRunning
 
-	MessageBox MB_YESNO|MB_ICONEXCLAMATION "To perform the specified operation, OpenVPN-GUI needs to be closed. You will have to restart it manually after the installation has completed. Shall I close it?" /SD IDYES IDYES guiEndYes
+	MessageBox MB_YESNO|MB_ICONEXCLAMATION "To perform the specified operation, the FCXTunnel GUI needs to be closed. You will have to restart it manually after the installation has completed. Shall I close it?" /SD IDYES IDYES guiEndYes
 	Quit
 
 	guiEndYes:
-		DetailPrint "Closing OpenVPN-GUI..."
+		DetailPrint "Closing FCXTunnel-GUI..."
 		; user wants to close GUI as part of install/upgrade
 		FindWindow $0 "OpenVPN-GUI"
 		IntCmp $0 0 guiNotRunning
@@ -280,7 +280,7 @@ Section -pre
 		; check for running openvpn.exe processes
 		${nsProcess::FindProcess} "openvpn.exe" $R0
 		${If} $R0 == 0
-			MessageBox MB_OK|MB_ICONEXCLAMATION "The installation cannot continue as OpenVPN is currently running. Please close all OpenVPN instances and re-run the installer."
+			MessageBox MB_OK|MB_ICONEXCLAMATION "The installation cannot continue as FCXTunnel is currently running. Please close all FCXTunnel instances and re-run the installer."
 			Call RestoreServiceState
 			Quit
 		${EndIf}
@@ -585,7 +585,7 @@ Function .onInit
 
 ${IfNot} ${AtLeastWinVista}
 
-	MessageBox MB_YESNO|MB_ICONEXCLAMATION "This package does not work on your operating system.  The last version of OpenVPN supported on your OS is 2.3. Shall I open a web browser for you to download it?" /SD IDNO IDYES DownloadForWinXP
+	MessageBox MB_YESNO|MB_ICONEXCLAMATION "This package does not work on your operating system.  The last version of FCXTunnel supported on your OS is 2.3. Shall I open a web browser for you to download it?" /SD IDNO IDYES DownloadForWinXP
 	Quit
 
 	DownloadForWinXP:
@@ -613,13 +613,13 @@ ${EndIf}
 	!insertmacro SelectByParameter ${SecOpenVPNUserSpace} SELECT_OPENVPN 1
 	!insertmacro SelectByParameter ${SecService} SELECT_SERVICE 1
 	!insertmacro SelectByParameter ${SecTAP} SELECT_TAP 1
-	!insertmacro SelectByParameter ${SecOpenVPNGUI} SELECT_OPENVPNGUI 1
+	!insertmacro SelectByParameter ${SecOpenVPNGUI} SELECT_OPENVPNGUI 0
 	!insertmacro SelectByParameter ${SecFileAssociation} SELECT_ASSOCIATIONS 1
 	!insertmacro SelectByParameter ${SecOpenSSLUtilities} SELECT_OPENSSL_UTILITIES 1
 	!insertmacro SelectByParameter ${SecOpenVPNEasyRSA} SELECT_EASYRSA 0
-	!insertmacro SelectByParameter ${SecAddShortcuts} SELECT_SHORTCUTS 1
-	!insertmacro SelectByParameter ${SecLaunchGUIOnLogon} SELECT_LAUNCH 1
-	!insertmacro SelectByParameter ${SecLaunchGUIOnLogon0} SELECT_LAUNCH 1
+	!insertmacro SelectByParameter ${SecAddShortcuts} SELECT_SHORTCUTS 0
+	!insertmacro SelectByParameter ${SecLaunchGUIOnLogon} SELECT_LAUNCH 0
+	!insertmacro SelectByParameter ${SecLaunchGUIOnLogon0} SELECT_LAUNCH 0
 	!insertmacro SelectByParameter ${SecDisableSavePass} SELECT_DISABLE_SAVEPASS 0
 	!insertmacro SelectByParameter ${SecOpenSSLDLLs} SELECT_OPENSSLDLLS 1
 	!insertmacro SelectByParameter ${SecLZODLLs} SELECT_LZODLLS 1
