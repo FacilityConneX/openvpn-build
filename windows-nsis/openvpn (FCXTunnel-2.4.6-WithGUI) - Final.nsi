@@ -225,18 +225,17 @@ Function CacheServiceState
 FunctionEnd
 
 Function RestoreServiceState
-	
-	;JP12Jan2019 - removed interactive and legacy service
-	;${If} $iservice_was_running == 4
-	;${OrIf} $iservice_existed != 0
-	;	DetailPrint "Starting FCXTunnel Interactive Service"
-	;	SimpleSC::StartService "OpenVPNServiceInteractive" "" 5
-	;${EndIf}
 
-	;${If} $legacy_service_was_running == 4
-	;	DetailPrint "Restarting FCXTunnel Legacy Service"
-	;	SimpleSC::StartService "FCXTunnelServiceLegacy" "" 10
-	;${EndIf}
+	${If} $iservice_was_running == 4
+	${OrIf} $iservice_existed != 0
+		DetailPrint "Starting FCXTunnel Interactive Service"
+		SimpleSC::StartService "OpenVPNServiceInteractive" "" 5
+	${EndIf}
+
+	${If} $legacy_service_was_running == 4
+		DetailPrint "Restarting FCXTunnel Legacy Service"
+		SimpleSC::StartService "FCXTunnelServiceLegacy" "" 10
+	${EndIf}
 
 	${If} $service_existed == 0
 		DetailPrint "Restoring starttype of FCXTunnel Service"
@@ -252,9 +251,8 @@ FunctionEnd
 
 Function StopServices
 	DetailPrint "Stopping FCXTunnel services..."
-	;JP12Jan2019 - removed interactive and legacy service	
-	;SimpleSC::StopService "OpenVPNServiceInteractive" 0 10
-	;SimpleSC::StopService "FCXTunnelServiceLegacy" 0 10
+	SimpleSC::StopService "OpenVPNServiceInteractive" 0 10
+	SimpleSC::StopService "FCXTunnelServiceLegacy" 0 10
 	SimpleSC::StopService "FCXTunnelService" 0 10
 FunctionEnd
 
@@ -302,16 +300,15 @@ Section -pre
 
 SectionEnd
 
-;JP12Jan2019 - Removed
-;Section /o "-workaround" SecAddShortcutsWorkaround
+Section /o "-workaround" SecAddShortcutsWorkaround
 	; this section should be selected as SecAddShortcuts
 	; as we don't want to move SecAddShortcuts to top of selection
-;SectionEnd
+SectionEnd
 
-;Section /o "-launchondummy" SecLaunchGUIOnLogon0
+Section /o "-launchondummy" SecLaunchGUIOnLogon0
 	; this section should be selected as SecLaunchGUIOnLogon
 	; this is here as we don't want to move that section to the top
-;SectionEnd
+SectionEnd
 
 ; We do not make this hidden as its informative to have displayed, but make it readonly (always selected)
 Section "${PACKAGE_NAME2} User-Space Components" SecOpenVPNUserSpace
@@ -418,30 +415,29 @@ Function CoreSetup
 	!insertmacro WriteRegStringIfUndef HKLM "SOFTWARE\${PACKAGE_NAME0}" "ovpn_admin_group" "OpenVPN Administrators"
 	!insertmacro WriteRegDWORDIfUndef  HKLM "SOFTWARE\${PACKAGE_NAME0}" "disable_save_passwords"  0
 
-;JP12Jan2019 - removed interactive and legacy service
-;	${If} $iservice_existed == 0
-;		; This is required because the install directory may have changed
-;		SimpleSC::SetServiceBinaryPath "OpenVPNServiceInteractive" '"$INSTDIR\bin\openvpnserv.exe"'
-;	${Else}
-;		;JP11Jan2019 - set to manual start (3)
-;		DetailPrint "Installing FCXTunnel Interactive Service..."
-;		SimpleSC::InstallService "OpenVPNServiceInteractive" "FCXTunnel Interactive Service" "32" "3" '"$INSTDIR\bin\openvpnserv.exe"' "tap0901/dhcp" "" ""
-;	${EndIf}
-;
-;	${If} $legacy_service_existed == 0
-;		SimpleSC::SetServiceBinaryPath "FCXTunnelServiceLegacy" '"$INSTDIR\bin\openvpnserv.exe"'
-;	${Else}
-;		DetailPrint "Installing FCXTunnel Legacy Service..."
-;		SimpleSC::InstallService "FCXTunnelServiceLegacy" "FCXTunnel Legacy Service" "32" "3" '"$INSTDIR\bin\openvpnserv.exe"' "tap0901/dhcp" "" ""
-;	${EndIf}
+	${If} $iservice_existed == 0
+		; This is required because the install directory may have changed
+		SimpleSC::SetServiceBinaryPath "OpenVPNServiceInteractive" '"$INSTDIR\bin\openvpnserv.exe"'
+	${Else}
+		;JP11Jan2019 - set to manual start (3)
+		DetailPrint "Installing FCXTunnel Interactive Service..."
+		SimpleSC::InstallService "OpenVPNServiceInteractive" "FCXTunnel Interactive Service" "32" "3" '"$INSTDIR\bin\openvpnserv.exe"' "tap0901/dhcp" "" ""
+	${EndIf}
+
+	${If} $legacy_service_existed == 0
+		SimpleSC::SetServiceBinaryPath "FCXTunnelServiceLegacy" '"$INSTDIR\bin\openvpnserv.exe"'
+	${Else}
+		DetailPrint "Installing FCXTunnel Legacy Service..."
+		SimpleSC::InstallService "FCXTunnelServiceLegacy" "FCXTunnel Legacy Service" "32" "3" '"$INSTDIR\bin\openvpnserv.exe"' "tap0901/dhcp" "" ""
+	${EndIf}
 
 FunctionEnd
 
 Section /o "TAP Virtual Ethernet Adapter" SecTAP
 	
-	;JP - No options, just install al Read Only Selected
-	SectionIn RO ; section cannot be checked by user
-	
+	;JP - No options, just install as Read Only Selected
+	SectionIn RO ; section cannot be checked by user	
+
 	SetOverwrite on
 	SetOutPath "$TEMP"
 
@@ -458,7 +454,7 @@ SectionEnd
 
 Section /o "${PACKAGE_NAME2} GUI" SecOpenVPNGUI
 
-	;JP - No GUI in this installer
+  	;JP - No GUI in this installer
 	SectionIn RO ; section cannot be checked by user
 
 	SetOverwrite on
@@ -505,7 +501,7 @@ Section "-OpenSSL Utilities" SecOpenSSLUtilities
 SectionEnd
 
 Section /o "EasyRSA 2 Certificate Management Scripts" SecOpenVPNEasyRSA
-	
+
 	;JP - Not option in this installer
 	SectionIn RO ; section cannot be checked by user
 
@@ -532,11 +528,11 @@ Section /o "EasyRSA 2 Certificate Management Scripts" SecOpenVPNEasyRSA
 SectionEnd
 
 SectionGroup "!Advanced"
-	
+
 	Section /o "${PACKAGE_NAME2} File Associations" SecFileAssociation
 
 		;JP - Not option in this installer
-		SectionIn RO ; section cannot be checked by user
+		SectionIn RO ; section cannot be checked by use
 		
 		WriteRegStr HKCR ".${OPENVPN_CONFIG_EXT}" "" "${PACKAGE_NAME0}File"
 		WriteRegStr HKCR "${PACKAGE_NAME0}File" "" "${PACKAGE_NAME0} Config File"
@@ -548,14 +544,13 @@ SectionGroup "!Advanced"
 	SectionEnd
 
 	Section /o "Add Shortcuts to Start Menu" SecAddShortcuts
-		
 		;JP - Not option in this installer
 		SectionIn RO ; section cannot be checked by user
-
+		
 		SetOverwrite on
 		CreateDirectory "$SMPROGRAMS\${PACKAGE_NAME2}\Documentation"
 		WriteINIStr "$SMPROGRAMS\${PACKAGE_NAME2}\Documentation\${PACKAGE_NAME2} HOWTO.url" "InternetShortcut" "URL" "https://facilityconnex.com"
-		WriteINIStr "$SMPROGRAMS\${PACKAGE_NAME2}\Documentation\${PACKAGE_NAME2} Web Site.url" "InternetShortcut" "URL" "https://facilityconnex.com/"
+		WriteINIStr "$SMPROGRAMS\${PACKAGE_NAME2}\Documentation\${PACKAGE_NAME2} Web Site.url" "InternetShortcut" "URL" "https://facilityconnex.com"
 		WriteINIStr "$SMPROGRAMS\${PACKAGE_NAME2}\Documentation\${PACKAGE_NAME2} Wiki.url" "InternetShortcut" "URL" "https://facilityconnex.com"
 		WriteINIStr "$SMPROGRAMS\${PACKAGE_NAME2}\Documentation\${PACKAGE_NAME2} Support.url" "InternetShortcut" "URL" "https://facilityconnex.com"
 
@@ -563,17 +558,14 @@ SectionGroup "!Advanced"
 	SectionEnd
 
 	Section /o "Launch ${PACKAGE_NAME2} GUI on User Logon" SecLaunchGUIOnLogon
-		
 		;JP - Not option in this installer
-		SectionIn RO ; section cannot be checked by user	
-		
+		SectionIn RO ; section cannot be checked by user
 	SectionEnd
 
 	Section /o "Disable Password Save Feature in ${PACKAGE_NAME2} GUI" SecDisableSavePass
-		
+
 		;JP - Not option in this installer
 		SectionIn RO ; section cannot be checked by user
-
 		WriteRegDWORD HKLM "SOFTWARE\${PACKAGE_NAME2}" "disable_save_passwords"  1
 	SectionEnd
 
@@ -650,17 +642,17 @@ ${EndIf}
 		${EndIf}
 	${EndIf}
 
-	!insertmacro SelectByParameter ${SecAddShortcutsWorkaround} SELECT_SHORTCUTS 0
+	!insertmacro SelectByParameter ${SecAddShortcutsWorkaround} SELECT_SHORTCUTS 1
 	!insertmacro SelectByParameter ${SecOpenVPNUserSpace} SELECT_OPENVPN 1
 	!insertmacro SelectByParameter ${SecService} SELECT_SERVICE 1
 	!insertmacro SelectByParameter ${SecTAP} SELECT_TAP 1
-	!insertmacro SelectByParameter ${SecOpenVPNGUI} SELECT_OPENVPNGUI 0
+	!insertmacro SelectByParameter ${SecOpenVPNGUI} SELECT_OPENVPNGUI 1
 	!insertmacro SelectByParameter ${SecFileAssociation} SELECT_ASSOCIATIONS 1
 	!insertmacro SelectByParameter ${SecOpenSSLUtilities} SELECT_OPENSSL_UTILITIES 1
 	!insertmacro SelectByParameter ${SecOpenVPNEasyRSA} SELECT_EASYRSA 0
 	!insertmacro SelectByParameter ${SecAddShortcuts} SELECT_SHORTCUTS 0
-	!insertmacro SelectByParameter ${SecLaunchGUIOnLogon} SELECT_LAUNCH 0
-	!insertmacro SelectByParameter ${SecLaunchGUIOnLogon0} SELECT_LAUNCH 0
+	!insertmacro SelectByParameter ${SecLaunchGUIOnLogon} SELECT_LAUNCH 1
+	!insertmacro SelectByParameter ${SecLaunchGUIOnLogon0} SELECT_LAUNCH 1
 	!insertmacro SelectByParameter ${SecDisableSavePass} SELECT_DISABLE_SAVEPASS 0
 	!insertmacro SelectByParameter ${SecOpenSSLDLLs} SELECT_OPENSSLDLLS 1
 	!insertmacro SelectByParameter ${SecLZODLLs} SELECT_LZODLLS 1
@@ -792,13 +784,12 @@ Section "Uninstall"
 	; Services have to be explicitly stopped before they are removed
 	DetailPrint "Stopping FCXTunnel Services..."
 	SimpleSC::StopService "FCXTunnelService" 0 10
-;JP12Jan2019 - removed interactive and legacy service	
-	;SimpleSC::StopService "OpenVPNServiceInteractive" 0 10
-	;SimpleSC::StopService "FCXTunnelServiceLegacy" 0 10
+	SimpleSC::StopService "OpenVPNServiceInteractive" 0 10
+	SimpleSC::StopService "FCXTunnelServiceLegacy" 0 10
 	DetailPrint "Removing FCXTunnel Services..."
 	SimpleSC::RemoveService "FCXTunnelService"
-	;SimpleSC::RemoveService "OpenVPNServiceInteractive"
-	;SimpleSC::RemoveService "FCXTunnelServiceLegacy"
+	SimpleSC::RemoveService "OpenVPNServiceInteractive"
+	SimpleSC::RemoveService "FCXTunnelServiceLegacy"
 	Sleep 3000
 
 	ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${PACKAGE_NAME0}" "tap"
