@@ -8,3 +8,5 @@ tmp
 *.pfx
 *.cer
 *.crt
+
+windows-nsis/install-whirl\.bmp
